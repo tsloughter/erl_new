@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+if [ $# -ne 2 ]
+then
+    echo "Usage: erl_new <type> <project_name>"
+    exit 1
+fi
+
+TYPE=$1
+PROJECT_NAME=$2
+
+echo Creating project $PROJECT_NAME of type $TYPE
+
+git clone git://github.com/tsloughter/${TYPE}_template.git $PROJECT_NAME || exit 1
+
+cd $PROJECT_NAME || exit 1
+
+USER=`git config --get user.name`
+EMAIL=`git config --get user.email | sed -e 's/\@/\\@/'`
+DATE=`date +"%d %b %Y"`
+YEAR=`date +"%Y"`
+
+find . -type f | xargs perl -pi -e "s/project_name/${PROJECT_NAME}/g"
+find . -type f | xargs perl -pi -e "s/{username}/${USER}/g"
+find . -type f | xargs perl -pi -e "s/{email}/${EMAIL//@/\\@}/g"
+find . -type f | xargs perl -pi -e "s/{date}/${DATE}/g"
+find . -type f | xargs perl -pi -e "s/{year}/${YEAR}/g"
+
+find . -name "*project_name*" | rename "s/project_name/${PROJECT_NAME}/"
+
+echo Done creating $PROJECT_NAME
+
+exit 0
